@@ -99,7 +99,7 @@ def preprocess():
             
     
     print("[Routes->before session.get(haha)] : ",session.get("haha"))
-    if(os.path.exists("ssebowa/clean/clean.csv")):
+    if("ext" in session and os.path.exists("ssebowa/clean/clean.csv")):
     #if session.get("haha") != None and session.get("haha") !=False:
         df = gp.read_dataset("ssebowa/clean/clean.csv")
         description = gp.get_description(df)
