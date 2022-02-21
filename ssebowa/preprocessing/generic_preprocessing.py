@@ -7,11 +7,11 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 def read_dataset(filepath):
 
-    if session["ext"] == "csv":
+    if "ext" in session and session["ext"] == "csv":
         df = pd.read_csv(filepath)
-    elif session["ext"] == "json":
+    elif "ext" in session and session["ext"] == "json":
         df = pd.read_json(filepath)
-    elif session["ext"] == "xlsx":
+    elif "ext" in session and  session["ext"] == "xlsx":
         df = pd.read_excel(filepath)
     else:
         flash(f"Error! Matching extension not found", "danger")
