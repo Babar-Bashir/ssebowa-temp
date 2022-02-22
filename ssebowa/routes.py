@@ -102,41 +102,46 @@ def preprocess():
     if("ext" in session and os.path.exists("ssebowa/clean/clean.csv")):
     #if session.get("haha") != None and session.get("haha") !=False:
         df = gp.read_dataset("ssebowa/clean/clean.csv")
-        description = gp.get_description(df)
-        columns = gp.get_columns(df)
-        print(columns)
-        dim1, dim2 = gp.get_dim(df)
-        head = gp.get_head(df)
+        if(df != -110):
+            description = gp.get_description(df)
+            columns = gp.get_columns(df)
+            print(columns)
+            dim1, dim2 = gp.get_dim(df)
+            head = gp.get_head(df)
 
-        return render_template(
-            "preprocess.html",
-            active="preprocess",
-            title="Preprocess",
-            filename=session["fname"],
-            posted=posted,
-            eda=eda,
-            no_of_rows=len(df),
-            no_of_cols=len(columns),
-            dim=str(dim1) + " x " + str(dim2),
-            description=description.to_html(
-                classes=[
-                    "table-bordered",
-                    "table-striped",
-                    "table-hover",
-                    "thead-light",
-                ]
-            ),
-            columns=columns,
-            head=head.to_html(
-                classes=[
-                    "table",
-                    "table-bordered",
-                    "table-striped",
-                    "table-hover",
-                    "thead-light",
-                ]
-            ),
-        )
+            return render_template(
+                "preprocess.html",
+                active="preprocess",
+                title="Preprocess",
+                filename=session["fname"],
+                posted=posted,
+                eda=eda,
+                no_of_rows=len(df),
+                no_of_cols=len(columns),
+                dim=str(dim1) + " x " + str(dim2),
+                description=description.to_html(
+                    classes=[
+                        "table-bordered",
+                        "table-striped",
+                        "table-hover",
+                        "thead-light",
+                    ]
+                ),
+                columns=columns,
+                head=head.to_html(
+                    classes=[
+                        "table",
+                        "table-bordered",
+                        "table-striped",
+                        "table-hover",
+                        "thead-light",
+                    ]
+                ),
+            )
+        else:
+            return render_template(
+                "preprocess.html", active="preprocess", title="Preprocess",
+            )
     else:
         return render_template(
             "preprocess.html", active="preprocess", title="Preprocess",

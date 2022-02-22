@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from flask import session, flash
 import pandas as pd
 import numpy as np
@@ -6,7 +7,7 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 
 def read_dataset(filepath):
-
+    df = -110
     if "ext" in session and session["ext"] == "csv":
         df = pd.read_csv(filepath)
     elif "ext" in session and session["ext"] == "json":
