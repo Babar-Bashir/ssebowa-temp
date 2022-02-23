@@ -9,12 +9,12 @@ import os
 import csv
 
 
-def get_columns():
-    df = pd.read_csv("ssebowa/clean/clean.csv")
+def get_columns(request):
+    df = pd.read_csv("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
     return df.columns
 
-def pair_plot():
-    df = pd.read_csv("ssebowa/clean/clean.csv")
+def pair_plot(request):
+    df = pd.read_csv("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
     start=time.time()
     sns_plot = sns.pairplot(df, height=2.5)
     mid=time.time()
@@ -24,8 +24,8 @@ def pair_plot():
     return True
 
 
-def xy_plot(col1, col2):
-    df = pd.read_csv("ssebowa/clean/clean.csv")
+def xy_plot(col1, col2,request):
+    df = pd.read_csv("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
     return df
 
 def hist_plot(df,feature_x):

@@ -172,10 +172,10 @@ def label_encoder(df, columns):
     return df, le_dict
 
 
-def arrange_columns(target):
-    df = read_dataset("ssebowa/clean/clean.csv")
+def arrange_columns(target, request):
+    df = read_dataset("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
     cols = df.columns.tolist()
     ind = cols.index(target)
     cols[ind], cols[-1] = cols[-1], cols[ind]
     df = df[cols]
-    df.to_csv("ssebowa/clean/clean.csv", mode="w", index=False)
+    df.to_csv("ssebowa/"+str(request.remote_addr)+"clean/clean.csv", mode="w", index=False)

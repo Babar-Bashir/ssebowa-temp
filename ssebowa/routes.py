@@ -1,6 +1,7 @@
 import secrets
 import asyncio
 import os.path
+import os
 import numpy as np
 import pandas as pd
 from pandas_profiling import ProfileReport
@@ -20,7 +21,7 @@ from ssebowa import app
 global posted
 global eda 
 global profile
-save_path = "ssebowa/uploads/"
+#save_path = "ssebowa/"+str(request.remote_addr)+"uploads/"
 exts = ["csv", "json", "yaml"]
 posted = 0
 profile = ""
@@ -34,16 +35,23 @@ def preprocess():
     eda=0
     
     if request.method == "POST":
-        
+        print(request.remote_addr)
+        print("------------------------")
+        print(request.remote_user)
         if request.form["Submit"] == "Upload":
+            if(os.path.exists("ssebowa/"+str(request.remote_addr)+"uploads")):
+                pass
+            else:
+                os.makedirs("ssebowa/"+str(request.remote_addr)+"uploads")
+                os.makedirs("ssebowa/"+str(request.remote_addr)+"clean")
             data = request.files["data"]
             ext = data.filename.split(".")[1]
             if ext in exts:
                 session["ext"] = ext
                 session["fname"] = data.filename
-                data.save("ssebowa/uploads/" + data.filename)
-                df = gp.read_dataset("ssebowa/uploads/" + data.filename)
-                df.to_csv("ssebowa/clean/clean.csv")
+                data.save("ssebowa/"+str(request.remote_addr)+"uploads/" + data.filename)
+                df = gp.read_dataset("ssebowa/"+str(request.remote_addr)+"uploads/" + data.filename)
+                df.to_csv("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
                 session["haha"] = True
                 flash(f"File uploaded successully", "success")
             else:
@@ -51,9 +59,9 @@ def preprocess():
 
         elif request.form["Submit"] == "Delete":
             try:
-                df = gp.read_dataset("ssebowa/clean/clean.csv")
+                df = gp.read_dataset("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
                 df = gp.delete_column(df, request.form.getlist("check_cols"))
-                df.to_csv("ssebowa/clean/clean.csv", mode="w", index=False)
+                df.to_csv("ssebowa/"+str(request.remote_addr)+"clean/clean.csv", mode="w", index=False)
                 #flash(f"Column(s) deleted Successfully", "success")
             except:
                 flash(f"Error! Upload Dataset", "danger")
@@ -61,7 +69,7 @@ def preprocess():
 
         elif request.form["Submit"] == "Clean":
             try:
-                df = gp.read_dataset("ssebowa/clean/clean.csv")
+                df = gp.read_dataset("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
                 print(request.form["how"])
                 if request.form["how"] != "any":
                     df = gp.treat_missing_numeric(
@@ -74,14 +82,14 @@ def preprocess():
                         how=float(request.form["howNos"]),
                     )
 
-                df.to_csv("ssebowa/clean/clean.csv", mode="w", index=False)
+                df.to_csv("ssebowa/"+str(request.remote_addr)+"clean/clean.csv", mode="w", index=False)
                 flash(f"Column(s) cleant Successfully", "success")
             except:
                 flash(f"Error! Upload Dataset", "danger")
 
         elif request.form["Submit"] == "Visualize":
             global posted
-            df = gp.read_dataset("ssebowa/clean/clean.csv")
+            df = gp.read_dataset("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
 
             x_col = request.form["x_col"]
 
@@ -91,7 +99,7 @@ def preprocess():
         elif request.form["Submit"] == "EDA":
             print("eda1")
             
-            df = gp.read_dataset("ssebowa/clean/clean.csv")
+            df = gp.read_dataset("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
             profile = ProfileReport(df, title="Ssebowa.ai",explorative=True)
             profile.to_file("ssebowa/templates/ssebowa.html")
             eda=1
@@ -99,10 +107,10 @@ def preprocess():
             
     
     print("[Routes->before session.get(haha)] : ",session.get("haha"))
-    if("ext" in session and os.path.exists("ssebowa/clean/clean.csv")):
+    if("ext" in session and os.path.exists("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")):
     #if session.get("haha") != None and session.get("haha") !=False:
-        df = gp.read_dataset("ssebowa/clean/clean.csv")
-        if(df != -110):
+        df = gp.read_dataset("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
+        if(not df.empty):
             description = gp.get_description(df)
             columns = gp.get_columns(df)
             print(columns)
@@ -153,7 +161,7 @@ def classify():
     acc = 0
     if request.method == "POST":
         target = request.form["target"]
-        gp.arrange_columns(target)
+        gp.arrange_columns(target,request)
         classifier = int(request.form["classifier"])
         hidden_val = int(request.form["hidden"])
         scale_val = int(request.form["scale_hidden"])
@@ -455,7 +463,7 @@ def classify():
                     cols=columns,
                 )
     elif request.method == "GET":
-        columns = vis.get_columns()
+        columns = vis.get_columns(request)
         return render_template(
             "classifier_page.html", active="classify", title="Classify", cols=columns
         )
@@ -474,7 +482,7 @@ def visualize():
         x_col = request.form["x_col"]
         y_col = request.form["y_col"]
 
-        df = vis.xy_plot(x_col, y_col)
+        df = vis.xy_plot(x_col, y_col,request)
         heights = np.array(df[x_col]).tolist()
         weights = np.array(df[y_col]).tolist()
 
@@ -499,8 +507,8 @@ def visualize():
         )
 
     else:
-        vis.pair_plot()
-        columns = vis.get_columns()
+        vis.pair_plot(request)
+        columns = vis.get_columns(request)
         return render_template(
             "visualize.html",
             cols=columns,

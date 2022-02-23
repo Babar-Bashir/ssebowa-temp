@@ -63,7 +63,7 @@ def RandomForest(value, choice, scale_val, encode_val):
     accuracies.clear()
     target_Names.clear()
 
-    df = gprep.read_dataset("ssebowa/clean/clean.csv")
+    df = gprep.read_dataset("ssebowa/"+str(request.remote_addr)+"clean/clean.csv")
 
     X = df.iloc[:, 1:-1]
     y = df.iloc[:, -1]

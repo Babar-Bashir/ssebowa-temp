@@ -42,9 +42,9 @@ def naiveBayes(value, choice, scale_val, encode_val):
     target_Names.clear()
 
     if (session['ext'] == 'csv'):
-        df = pd.read_csv('ssebowa/clean/clean.csv')
+        df = pd.read_csv('ssebowa/"+str(request.remote_addr)+"clean/clean.csv')
     elif (session['ext'] == 'json'):
-        df = pd.read_json('ssebowa/clean/clean.json')
+        df = pd.read_json('ssebowa/"+str(request.remote_addr)+"clean/clean.json')
 
     X = df.iloc[ : , 1 : -1]
     y = df.iloc[ : , -1]
