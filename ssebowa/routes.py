@@ -166,7 +166,7 @@ def classify():
         hidden_val = int(request.form["hidden"])
         scale_val = int(request.form["scale_hidden"])
         encode_val = int(request.form["encode_hidden"])
-        columns = vis.get_columns()
+        columns = vis.get_columns(request)
 
         if hidden_val == 0:
             data = request.files["choiceVal"]
